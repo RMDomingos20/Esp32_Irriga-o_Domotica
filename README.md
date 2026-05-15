@@ -174,8 +174,6 @@ Repositório: https://github.com/RMDomingos20/Esp32_Irriga-o_Domotica.git
 - Guilherme Gabriel Franco de Souza  
 - Jonathan Alexandre de Moraes Cândido  
 - Rafael Domingos Siqueira Magalhães  
-- Vitor Wohlers de Godoy  
-- Vinicius Henrique de Melo  
 
 ---
 
