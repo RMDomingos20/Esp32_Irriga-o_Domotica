@@ -1,187 +1,215 @@
+# Automated Irrigation System with ESP32
 
-# Sistema de Irrigação Automatizada com ESP32
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-ESP32-blue?style=for-the-badge&logo=espressif" />
+  <img src="https://img.shields.io/badge/Language-C%2B%2B-00599C?style=for-the-badge&logo=cplusplus" />
+  <img src="https://img.shields.io/badge/IDE-Arduino_IDE-00979D?style=for-the-badge&logo=arduino" />
+  <img src="https://img.shields.io/badge/WebServer-ESPAsyncWebServer-orange?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Architecture-IoT-success?style=for-the-badge" />
+</p>
 
-### Projeto Acadêmico — Automação Domótica  
-IFSP — Campus Bragança Paulista (BRA)  
-5º Semestre de Engenharia de Controle e Automação  
-
----
-
-## Descrição
-
-Este projeto consiste no desenvolvimento de um Sistema de Irrigação Inteligente utilizando o microcontrolador ESP32, um sensor de umidade do solo (resistivo) e um módulo relé para controle de uma válvula solenoide 127V.
-
-O sistema realiza a leitura contínua da umidade do solo e, com base em um controle de histerese, aciona ou desliga automaticamente o irrigador. Além disso, implementa um servidor web local, permitindo ao usuário monitorar em tempo real os níveis de umidade e o status da irrigação por meio de qualquer dispositivo conectado à mesma rede Wi-Fi.
-
----
-
-## Objetivo
-
-Desenvolver um sistema inteligente de automação residencial como parte da avaliação da disciplina de Automação Domótica, no 5º semestre do curso de Engenharia de Controle e Automação do IFSP — Campus Bragança Paulista.
+<p align="center">
+  Academic project developed for the Home Automation course<br>
+  Control and Automation Engineering — IFSP Bragança Paulista
+</p>
 
 ---
 
-## Funcionalidades
+## Overview
 
-- Leitura da umidade do solo (valor bruto e percentual)
-- Acionamento automático do irrigador via módulo relé
-- Controle por histerese, evitando acionamentos constantes
-- Interface web local para monitoramento em tempo real
-- Interface responsiva, acessível via computador, tablet ou smartphone
-- Calibração manual via software dos limites de umidade
-- Exibição de dados técnicos como valores ADC e limites configurados
+This project is an automated irrigation system based on the ESP32 microcontroller. The system monitors soil moisture using a resistive sensor and automatically controls irrigation through a relay module connected to a 127V solenoid valve.
+
+A local web server running directly on the ESP32 allows real-time monitoring from any device connected to the same Wi-Fi network. The interface displays soil moisture percentage, ADC readings, irrigation status, and configured control thresholds.
+
+The project was developed as part of the Home Automation discipline in the 5th semester of the Control and Automation Engineering course at IFSP — Bragança Paulista campus.
 
 ---
 
-## Arquitetura do Sistema
+## Features
 
-- Microcontrolador: ESP32 DevKit V1
-- Sensor: Umidade do Solo Resistivo
-- Atuador: Módulo Relé 5VDC
-- Dispositivo Controlado: Válvula Solenoide 127V (Normalmente Fechada)
-- Interface Web: HTML e JavaScript rodando no próprio ESP32
-- Conectividade: Wi-Fi (rede local)
-
----
-
-## Diagrama de Conexões
-
-### Sensor de Umidade ↔️ ESP32
-
-| Sensor            | ESP32  |
-|-------------------|--------|
-| VCC               | 3.3V   |
-| GND               | GND    |
-| A0 (Analógico)    | GPIO 35|
-
-Observação: Se alimentado com 5V, utilizar divisor resistivo na saída A0.
+- Automatic irrigation control
+- Soil moisture monitoring
+- Hysteresis-based switching logic
+- Embedded web interface hosted on ESP32
+- Real-time updates via Wi-Fi
+- Responsive interface for desktop and mobile devices
+- Manual calibration of moisture thresholds
+- Display of ADC readings and control parameters
 
 ---
 
-### Módulo Relé ↔️ ESP32
+## Technologies
 
-| Relé  | ESP32  |
-|-------|--------|
-| VCC   | 5V     |
-| GND   | GND    |
-| IN    | GPIO 5 |
-
----
-
-### Válvula Solenoide ↔️ Relé ↔️ Rede Elétrica
-
-| Válvula        | Relé   | Alimentação AC |
-|----------------|--------|-----------------|
-| Terminal 1     | COM    | Fase            |
-| Terminal 2     | NO     | Neutro          |
+| Technology | Description |
+|---|---|
+| C++ | Main programming language |
+| ESP32 | Main microcontroller |
+| Arduino IDE | Development environment |
+| HTML / JavaScript | Embedded web interface |
+| ESPAsyncWebServer | Asynchronous web server |
+| AsyncTCP | TCP communication library |
 
 ---
 
-## Interface Web
+## Hardware Architecture
 
-- Mostra umidade atual em percentual com barra de progresso
-- Mostra status do irrigador (ligado ou desligado)
-- Exibe os valores brutos do sensor (ADC)
-- Mostra os limites de controle configurados
-- Atualização automática a cada 2 segundos
-- Compatível com celular, tablet e computador
+The system uses an ESP32 DevKit V1 as the central controller. Soil moisture is measured through an analog resistive sensor connected to GPIO 35, while irrigation control is performed using a 5V relay module connected to GPIO 5.
+
+The relay switches a normally closed 127V AC solenoid valve responsible for controlling water flow.
 
 ---
 
-## Parâmetros do Código
+## Connections
+
+### Soil Moisture Sensor → ESP32
+
+| Sensor | ESP32 |
+|---|---|
+| VCC | 3.3V |
+| GND | GND |
+| A0 | GPIO 35 |
+
+> If the sensor is powered with 5V, a voltage divider is recommended on the analog output.
+
+---
+
+### Relay Module → ESP32
+
+| Relay | ESP32 |
+|---|---|
+| VCC | 5V |
+| GND | GND |
+| IN | GPIO 5 |
+
+---
+
+### Solenoid Valve → Relay → AC Power
+
+| Valve | Relay | AC Line |
+|---|---|---|
+| Terminal 1 | COM | Phase |
+| Terminal 2 | NO | Neutral |
+
+---
+
+## Control Logic
+
+The irrigation system uses hysteresis to avoid rapid switching caused by small oscillations in soil moisture.
 
 ```cpp
-// Limiares de controle
-float LIMIAR_LIGAR = 30.0;      // Em percentual
-float LIMIAR_DESLIGAR = 40.0;   // Em percentual
+float LIMIAR_LIGAR = 30.0;
+float LIMIAR_DESLIGAR = 40.0;
 
-// Calibração ADC do sensor
-int seco = 4095;     // Valor ADC com solo seco
-int molhado = 1400;  // Valor ADC com solo bem molhado
+int seco = 4095;
+int molhado = 1400;
+```
+
+The relay is activated when moisture falls below the minimum threshold and deactivated when the upper threshold is reached.
+
+---
+
+## Required Libraries
+
+```cpp
+#include <WiFi.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 ```
 
 ---
 
-## Lógica de Controle — Histerese
+## ESPAsyncWebServer Compatibility Fix
 
-- Liga irrigação quando a umidade for menor ou igual a LIMIAR_LIGAR
-- Desliga irrigação quando a umidade for maior ou igual a LIMIAR_DESLIGAR
+When using ESP32 Core 3.2.0 or newer, the following error may occur:
 
-Essa lógica evita o acionamento constante da válvula em situações de pequena oscilação de umidade, protegendo os componentes e aumentando sua vida útil.
-
----
-
-## Bibliotecas Necessárias
-
-- WiFi.h — Conexão Wi-Fi
-- AsyncTCP.h — Comunicação TCP assíncrona
-- ESPAsyncWebServer.h — Servidor Web assíncrono
-
----
-
-## Correção de Erros
-
-Atenção ao utilizar ESPAsyncWebServer com ESP32 Core versão 3.2.0 ou superior.
-
-Erro reportado:
-
-```
+```cpp
 error: call of overloaded 'IPAddress(unsigned int)' is ambiguous
 ```
 
-Solução aplicada:
+To fix it, edit:
 
-Editar o arquivo:
-
-```
+```txt
 /Arduino/libraries/ESP_Async_WebServer/src/AsyncWebSocket.cpp
 ```
 
-Modificar:
+Replace:
 
 ```cpp
-// Original (com erro)
 return IPAddress(0U);
+```
 
-// Corrigido
+With:
+
+```cpp
 return IPAddress((uint32_t)0);
 ```
 
 ---
 
-## Organização do Projeto
+## Project Structure
 
-```
-├── irrigacao_esp32.ino         # Código Sem WIFI.
-├── irrigacao_esp32.ino         # Código principal com WIFI.
+```txt
+Esp32_Irrigacao_Domotica
+├── irrigacao_esp32_sem_wifi.ino
+├── irrigacao_esp32_wifi.ino
 ├── drivers
-│   └──[...]                    # Drivers necessarios para funcionar a interface.
+│   └── [...]
 ├── Trabalho Teorico
-│   └──Trabalho Irrigação       # Teoria Documentada do trabalho.
-├── README.md                   # Este documento.
+│   └── Trabalho Irrigacao
+└── README.md
 ```
 
 ---
 
-## Acesso ao Projeto
+## Running the Project
 
-Repositório: https://github.com/RMDomingos20/Esp32_Irriga-o_Domotica.git
+1. Install the required libraries in Arduino IDE:
+   - ESPAsyncWebServer
+   - AsyncTCP
+
+2. Configure your Wi-Fi credentials:
+
+```cpp
+const char* ssid = "YOUR_WIFI";
+const char* password = "YOUR_PASSWORD";
+```
+
+3. Select the board:
+
+```txt
+ESP32 Dev Module
+```
+
+4. Compile and upload the code to the ESP32.
+
+5. Open the Serial Monitor and access the IP address displayed by the board.
 
 ---
 
-## Autores
+## Applications
 
-- Guilherme Gabriel Franco de Souza  
-- Jonathan Alexandre de Moraes Cândido  
-- Rafael Domingos Siqueira Magalhães  
+This project can be adapted for residential irrigation systems, greenhouses, smart gardens, and general IoT automation studies involving embedded systems and wireless monitoring.
 
 ---
 
-## Referências
+## Authors
 
-- ESPRESSIF SYSTEMS. ESP32 Datasheet.  
-- CASA DA ROBÓTICA — Documentação de componentes.  
-- Mendes, G. H.; Silva, D. R.; Oliveira, A. P. IoT aplicada à automação residencial.  
-- ONU — Relatório dos Objetivos de Desenvolvimento Sustentável 2023.  
+- Rafael Domingos Siqueira Magalhães
+- Guilherme Gabriel Franco de Souza
+- Jonathan Alexandre de Moraes Cândido
 
 ---
+
+## Institution
+
+Federal Institute of Education, Science and Technology of São Paulo — IFSP  
+Bragança Paulista Campus  
+Control and Automation Engineering
+
+---
+
+## Repository
+
+```txt
+https://github.com/RMDomingos20/Esp32_Irriga-o_Domotica
+```
